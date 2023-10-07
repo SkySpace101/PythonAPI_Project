@@ -2,8 +2,7 @@ from fastapi import FastAPI
 from fastapi.params import Body
 from pydantic import BaseModel
 from typing import Optional
-import random
-import string
+from random import randrange
 
 
 # Validation for the Post Requests (Creating a Schema using Pydantic)
@@ -13,28 +12,37 @@ class Post(BaseModel):
     published:bool = False
     rating: Optional[int] = None
 
-with open("book.txt",encoding="UTF-8") as f:
-    word_bag = f.read().split(" ")
-    random.shuffle(word_bag)
 
 app = FastAPI()
+
+my_posts = [{"title":"This is post-1","content":"content of post-1", "id":1}, \
+             {"title":"This is post-2","content":"content of post-2", "id":2}]
+
+
+def find_post(id):
+    for p in my_posts:
+        if p["id"] == id:
+            return p
 
 @app.get("/")
 async def root():
     return {"message":"Hello World"}
 
 @app.get("/posts")
-async def randomMsg():
-    return {"post": "".join([random.choice(string.ascii_letters) for i in range(50)])}
+async def get_posts():
+    return {"data": my_posts}
 
-@app.get("/passage")
-async def cryptic_msg ():
-    return {"msg": " ".join([random.choice(word_bag) for i in range(200)])}
 
-@app.post("/create")
-async def post_created(payload: Post):
-    print(payload)
-    print(payload.model_dump())
-    # return {"data": "This is the data"}
-    # return {"title":payload.title, "Content": payload.content}
-    return {"data": payload}
+@app.post("/posts")
+async def post_created(new_post: Post):
+    new_post = new_post.model_dump()
+    new_post['id'] = randrange(0,1000000)
+    my_posts.append(new_post)
+    return {"data": new_post}
+
+@app.get("/posts/{id}")
+async def get_post(id:int):
+    post = find_post(id)
+    # return {"data": f"The post you requested {id}"}
+    return {"data": post}
+
