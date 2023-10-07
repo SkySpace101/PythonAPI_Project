@@ -34,5 +34,7 @@ async def cryptic_msg ():
 @app.post("/create")
 async def post_created(payload: Post):
     print(payload)
+    print(payload.model_dump())
     # return {"data": "This is the data"}
-    return {"title":payload.title, "Content": payload.content}
+    # return {"title":payload.title, "Content": payload.content}
+    return {"data": payload}
