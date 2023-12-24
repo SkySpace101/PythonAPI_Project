@@ -1,10 +1,16 @@
-from fastapi import FastAPI, Response, status, HTTPException
+from fastapi import FastAPI, Response, status, HTTPException, Depends
 from fastapi.params import Body
 from pydantic import BaseModel
 from typing import Optional
 from random import randrange
 import psycopg2
 import time
+import models
+from database import engine, get_db
+from sqlalchemy.orm import Session
+
+# Adding the ORM to our main app file
+models.Base.metadata.create_all(bind=engine)
 
 
 # Validation for the Post Requests (Creating a Schema using Pydantic)
@@ -129,6 +135,12 @@ async def update_post(id: int, post: Post):
     my_posts[index] = post_dict
 
     return {"message": "updated post Successfully"}
+
+# defining a get route to test the db ORM.
+app.get("/sqlalchemy")
+async def test_posts(db: Session = Depends(get_db)):
+    return {"status": "success"}
+
 
 
 
