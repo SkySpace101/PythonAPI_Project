@@ -18,7 +18,7 @@ class Post(BaseModel):
     # id: int 
     title:str
     content:str
-    # published:bool = False
+    published:bool = False
     # rating: Optional[int] = None
     
 
@@ -79,12 +79,30 @@ async def get_posts(db: Session = Depends(get_db)):
 
 
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
-async def post_created(new_post: Post):
+async def post_created(post: Post, db: Session = Depends(get_db)):
     # new_post = new_post.model_dump()
     # new_post['id'] = randrange(0,1000000)
     # my_posts.append(new_post)
-    cursor.execute("INSERT INTO posts(title,content) VALUES (%s,%s)",vars=(new_post.title,new_post.content))
-    conn.commit()
+    # cursor.execute("INSERT INTO posts(title,content) VALUES (%s,%s)",vars=(new_post.title,new_post.content))
+    # conn.commit()
+
+    # We are creating the new post from the payload from the endpoint
+    # new_post = models.Post(title=post.title, content=post.content, published=post.published)
+
+    # there's an issue with previous line as if we have hundreds of filed it will become very combursome to write all this stuff so what follows will be done.
+    # print(**post.model_dump()) <-- we unpack the post dictionary using '**' operator
+
+    new_post = models.Post(**post.model_dump())
+
+    # need to add the data to out database
+    db.add(new_post)
+
+    # commit all the changes to the database
+    db.commit()
+
+    # getting returned post
+    db.refresh(new_post)
+
     return {"data": new_post}
 
 @app.get("/posts/latest")
