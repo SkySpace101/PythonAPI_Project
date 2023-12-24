@@ -70,8 +70,12 @@ async def root():
     return {"message":"Hello World"}
 
 @app.get("/posts")
-async def get_posts():
-    return {"data": my_posts}
+async def get_posts(db: Session = Depends(get_db)):
+    # cursor.execute("""SELECT * FROM posts """)
+    # posts = cursor.fetchall()
+    posts = db.query(models.Post).all()
+
+    return {"data": posts}
 
 
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
@@ -137,9 +141,16 @@ async def update_post(id: int, post: Post):
     return {"message": "updated post Successfully"}
 
 # defining a get route to test the db ORM.
-app.get("/sqlalchemy")
+@app.get("/sqlalchemy")
 async def test_posts(db: Session = Depends(get_db)):
-    return {"status": "success"}
+
+    posts = db.query(models.Post).all()
+    return {"data": posts}
+
+    # the below code simply return raw SQL Code that was abstracted via ORM
+    # posts = db.query(models.Post)
+    # print(posts)
+    # return {"status": "success"}
 
 
 
