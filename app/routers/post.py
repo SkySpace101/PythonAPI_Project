@@ -6,13 +6,17 @@ from sqlalchemy.orm import Session
 
 
 # Creating a router object
-router = APIRouter()
+# Adding a prefix argument to our API Router object to minimize url repetition in differnt routes. 
+# Thus simplifies our url.
+# adding tags parameter to group our particular routes logically
+router = APIRouter(prefix="/posts", 
+                   tags = ['Posts'])
 
 
 # all post related routes
 
 # Getting all posts
-@router.get("/posts", response_model=List[schemas.Post])
+@router.get("/", response_model=List[schemas.Post])
 async def get_posts(db: Session = Depends(get_db)):
 
     posts = db.query(models.Post).all()
@@ -21,7 +25,7 @@ async def get_posts(db: Session = Depends(get_db)):
 
 
 # Creating a Post
-@router.post("/posts", status_code=status.HTTP_201_CREATED, response_model=schemas.Post)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.Post)
 async def post_created(post: schemas.PostCreate, db: Session = Depends(get_db)):
 
     new_post = models.Post(**post.model_dump())
@@ -38,7 +42,7 @@ async def post_created(post: schemas.PostCreate, db: Session = Depends(get_db)):
     return new_post
 
 # Getting a post
-@router.get("/posts/{id}", response_model=schemas.Post)
+@router.get("/{id}", response_model=schemas.Post)
 async def get_post(id:int, db: Session = Depends(get_db)):
 
     try:
@@ -55,7 +59,7 @@ async def get_post(id:int, db: Session = Depends(get_db)):
 
 
 # Deleting a post
-@router.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_post(id: int, db: Session = Depends(get_db) ):
 
     post = db.query(models.Post).filter(models.Post.id == id) 
@@ -69,7 +73,7 @@ async def delete_post(id: int, db: Session = Depends(get_db) ):
 
 
 # Updating the Post
-@router.put("/posts/{id}", status_code=status.HTTP_202_ACCEPTED, response_model=schemas.Post)
+@router.put("/{id}", status_code=status.HTTP_202_ACCEPTED, response_model=schemas.Post)
 async def update_post(id: int, update_post: schemas.PostBase, db: Session = Depends(get_db)):
 
     post = db.query(models.Post).filter(models.Post.id == id)

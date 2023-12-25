@@ -4,12 +4,16 @@ from sqlalchemy.orm import Session
 from database import get_db
 
 # Creating a router object
-router = APIRouter()
+# Adding a prefix argument to our API Router object to minimize url repetition in differnt routes
+# Thus simplifies our url
+# adding tags parameter to group our particular routes logically
+router = APIRouter(prefix="/users",
+                   tags = ['Users'])
 
 # All user related routes
 
 # creating the user 
-@router.post("/users", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
 async def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
     # creating the hash of the password using the password context object we created previously.
@@ -27,7 +31,7 @@ async def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return new_user
 
 
-@router.get("/users/{id}" , response_model=schemas.UserOut)
+@router.get("/{id}" , response_model=schemas.UserOut)
 async def get_user(id: int, db: Session = Depends(get_db) ):
     user = db.query(models.User).filter(models.User.id == id).first()
 
