@@ -3,13 +3,16 @@ from fastapi.params import Body
 from pydantic import BaseModel
 from typing import Optional, List
 from random import randrange
+# from passlib.context import CryptContext
 import psycopg2
 import time
 import models
 from database import engine, get_db
 from sqlalchemy.orm import Session
-import schemas
+import schemas, utils
 
+# creating a hashing context object and selecting a hashing algorithm which in this case is bcrypt
+# pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # Adding the ORM to our main app file
 models.Base.metadata.create_all(bind=engine)
 
@@ -89,6 +92,23 @@ async def update_post(id: int, update_post: schemas.PostBase, db: Session = Depe
     # return {"message": "updated post Successfully"}
     return post.first()
 
+# creating the user endpoint
+@app.post("/users", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
+def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+
+    # creating the hash of the password using the password context object we created previously.
+    # hashed_password = pwd_context.hash(user.password)
+    hashed_password = utils.hash(user.password)
+
+    # then we are storing this hashed password to user.password
+    user.password = hashed_password
+
+    new_user = models.User(**user.model_dump())
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    return new_user
 
 
 

@@ -1,9 +1,8 @@
-# Every python model represents a table in the database.
+# ORM Models
 from database import Base
 from sqlalchemy import Column, Integer, String, Boolean, Float, TIMESTAMP, text
 
 class Post(Base):
-    # Naming the table
     __tablename__ = "pst"
 
     id = Column(Integer, primary_key= True, nullable = False)
@@ -13,17 +12,12 @@ class Post(Base):
     created_at = Column(TIMESTAMP(timezone=True), nullable= False, server_default=text('now()'))
 
 
-
-#Random Table for fun
-# class Toast(Base):
-
-#     #naming the model
-#     __tablename__ = "toast"
-
-#     SerialNo = Column(Integer, primary_key=True, nullable=False)
-#     Name = Column(String, nullable = False)
-#     Marks1 = Column(Float, nullable=False)
-#     Marks2 = Column(Float, nullable=False)
-#     Pass = Column(Boolean, nullable=False, default=True)
-
+# Creating a user table model for user registration
+    
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key= True, nullable = False)
+    email = Column(String, nullable=False, unique=True)
+    password = Column(String, nullable=False)
+    created_at = Column(TIMESTAMP(timezone=True), nullable= False, server_default=text('now()'))
     
