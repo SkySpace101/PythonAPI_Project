@@ -8,62 +8,16 @@ import time
 import models
 from database import engine, get_db
 from sqlalchemy.orm import Session
+import schemas
 
 # Adding the ORM to our main app file
 models.Base.metadata.create_all(bind=engine)
 
 
-# Validation for the Post Requests (Creating a Schema using Pydantic)
-class Post(BaseModel):
-    # id: int 
-    title:str
-    content:str
-    published:bool = False
-    # rating: Optional[int] = None
-    
-
-# To be safe from client side intrusion and attacks it's better to have a
-#  data validation in place when asking the client for data.
-
+# creating a fastapi app.
 app = FastAPI()
 
-my_posts = [{"title":"This is post-1","content":"content of post-1", "id":1}, \
-             {"title":"This is post-2","content":"content of post-2", "id":2}]
-
-
-# database connection and Stuff
-
-while True:
-    try:
-        conn = psycopg2.connect(host="localhost",database='fastapi',user='postgres', password='admin')
-        cursor = conn.cursor()
-        print("database connection established")
-        break;
-    except Exception as Error:
-        print("The connection to database not established")
-        time.sleep(2)
-
-
-# cursor.execute("SELECT * FROM posts")
-# cursor.execute("INSERT INTO posts(title,content) VALUES ('this is post-4','This is content of fourth post') RETURNING *;")
-# # cursor.fetchall();
-# conn.commit()
-# cursor.close()
-# conn.close()
-# print("The database connection is closed")
-
-
-# Utility functions
-
-def find_post(id):
-    for p in my_posts:
-        if p["id"] == id:
-            return p
-        
-def find_post_index(id):
-     for i,p in enumerate(my_posts):
-        if p["id"] == id:
-            return i
+# routes
 
 @app.get("/")
 async def root():
@@ -79,7 +33,7 @@ async def get_posts(db: Session = Depends(get_db)):
 
 
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
-async def post_created(post: Post, db: Session = Depends(get_db)):
+async def post_created(post: schemas.PostCreate, db: Session = Depends(get_db)):
     # new_post = new_post.model_dump()
     # new_post['id'] = randrange(0,1000000)
     # my_posts.append(new_post)
@@ -156,7 +110,7 @@ async def delete_post(id: int, db: Session = Depends(get_db) ):
 # Updating the Post
 
 @app.put("/posts/{id}", status_code=status.HTTP_202_ACCEPTED)
-async def update_post(id: int, update_post: Post, db: Session = Depends(get_db)):
+async def update_post(id: int, update_post: schemas.PostBase, db: Session = Depends(get_db)):
     # print(post)
     # index = find_post_index(id)
     # if(index == None):
