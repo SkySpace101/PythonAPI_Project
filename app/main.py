@@ -1,10 +1,5 @@
 from fastapi import FastAPI, Response, status, HTTPException, Depends
-from fastapi.params import Body
-from pydantic import BaseModel
-from typing import Optional, List
-from random import randrange
-import psycopg2
-import time
+from typing import  List
 import models
 from database import engine, get_db
 from sqlalchemy.orm import Session
@@ -118,7 +113,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     user.password = hashed_password
 
     new_user = models.User(**user.model_dump())
-    
+
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
