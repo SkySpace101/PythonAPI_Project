@@ -29,3 +29,8 @@ class UserOut(BaseModel):
     class Config:
         orm_mode = True
 
+# creating a schema for authentication information
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+

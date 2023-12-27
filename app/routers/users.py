@@ -1,12 +1,9 @@
-from fastapi import FastAPI, Response, status, HTTPException, Depends, APIRouter
+from fastapi import status, HTTPException, Depends, APIRouter
 import models, schemas, utils
 from sqlalchemy.orm import Session
 from database import get_db
 
 # Creating a router object
-# Adding a prefix argument to our API Router object to minimize url repetition in differnt routes
-# Thus simplifies our url
-# adding tags parameter to group our particular routes logically
 router = APIRouter(prefix="/users",
                    tags = ['Users'])
 
@@ -30,7 +27,7 @@ async def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
     return new_user
 
-
+# Getting the user data
 @router.get("/{id}" , response_model=schemas.UserOut)
 async def get_user(id: int, db: Session = Depends(get_db) ):
     user = db.query(models.User).filter(models.User.id == id).first()

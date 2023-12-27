@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Response, status, HTTPException, Depends, APIRouter
+from fastapi import status, HTTPException, Depends, APIRouter
 import models, schemas
 from database import get_db
 from typing import  List
@@ -6,9 +6,6 @@ from sqlalchemy.orm import Session
 
 
 # Creating a router object
-# Adding a prefix argument to our API Router object to minimize url repetition in differnt routes. 
-# Thus simplifies our url.
-# adding tags parameter to group our particular routes logically
 router = APIRouter(prefix="/posts", 
                    tags = ['Posts'])
 
